@@ -1,4 +1,4 @@
-package backend.spring_boot_docker;
+package dev.thesphere.quell;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,6 +13,7 @@ public class SpringBootDockerApplication {
 
     // tasks need to have a DTO object designed for them
 	public static void main(String[] args) {
+        System.out.println("dd");
 		SpringApplication.run(SpringBootDockerApplication.class, args);
 	}
 

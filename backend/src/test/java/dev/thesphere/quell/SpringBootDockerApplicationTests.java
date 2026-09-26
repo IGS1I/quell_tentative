@@ -1,4 +1,4 @@
-package backend.spring_boot_docker;
+package dev.thesphere.quell;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

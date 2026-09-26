@@ -1,8 +1,34 @@
-# TODO: this needs to actually build from the gradle ideally (gradle build)
-FROM eclipse-temurin:17
+# syntax=docker/dockerfile:1
 
-ARG JAR_FILE=target/*.jar
+# dev stage
+FROM eclipse-temurin:21-jdk AS dev
+WORKDIR /app
+COPY gradlew .
+COPY gradle gradle
+COPY build.gradle .
+COPY settings.gradle .
+RUN chmod +x gradlew
+RUN --mount=type=cache,target=/root/.gradle \
+    ./gradlew dependencies --no-daemon -q
+COPY src src
+ENTRYPOINT ["./gradlew", "bootRun", "--no-daemon"]
 
-COPY ${JAR_FILE} app.jar
+# build stage
+FROM eclipse-temurin:21-jdk AS build
+WORKDIR /app
+COPY gradlew .
+COPY gradle gradle
+COPY build.gradle .
+COPY settings.gradle .
+RUN chmod +x gradlew
+RUN --mount=type=cache,target=/root/.gradle \
+    ./gradlew dependencies --no-daemon -q
+COPY src src
+RUN --mount=type=cache,target=/root/.gradle \
+    ./gradlew build -x test --no-daemon
 
-ENTRYPOINT ["java","-jar","/app.jar"]
+# prod
+FROM eclipse-temurin:21-jre AS prod
+WORKDIR /app
+COPY --from=build /app/build/libs/*.jar app.jar
+ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/quell_tentative.iml" filepath="$PROJECT_DIR$/.idea/quell_tentative.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/spring_boot_docker.main.iml" filepath="$PROJECT_DIR$/.idea/modules/spring_boot_docker.main.iml" />
     </modules>
   </component>
 </project>

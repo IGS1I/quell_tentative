@@ -1,10 +1,64 @@
 services:
-  my-app:
+
+  frontend:
     build: ./frontend
     ports:
       - "4200:4200"
     networks:
-      - silly
+      - quell-net
+
+  backend:
+    build:
+      context: ./backend
+      target: dev
+    volumes:
+      - ./backend/src:/app/src
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/quell
+      SPRING_DATASOURCE_USERNAME: quell
+      SPRING_DATASOURCE_PASSWORD: quell
+      SPRING_DEVTOOLS_RESTART_ENABLED: "true"
+      SPRING_DEVTOOLS_LIVERELOAD_ENABLED: "true"
+    ports:
+      - "8080:8080"
+      - "35729:35729" # hotswap
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - quell-net
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: quell
+      POSTGRES_USER: quell
+      POSTGRES_PASSWORD: quell
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U quell -d quell"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - quell-net
+
+  adminer:
+    image: adminer
+    ports:
+      - "8888:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - quell-net
+
 networks:
-  silly:
+  quell-net:
     driver: bridge
+
+volumes:
+  postgres-data:
