@@ -1,0 +1,31 @@
+<!-- https://github.com/MyAngularApps/Analog-Clock-App -->
+
+<div class="container">
+  <ul>
+    <li>
+      <div class="clock-view">
+        <!-- this can either be replaced with the clock in the figma or style this clock to fix -->
+        <analog-clock [options]="{ size: 200, showNumbers: true }"></analog-clock>
+      </div>
+    </li>
+    <li>
+      <div class="work-blocks">
+        @for (workBlock of workBlocks; track workBlock.name) {
+          <work-comp [name]="workBlock.name" [taskTitles]="workBlock.taskTitles" />
+        }
+      </div>
+    </li>
+    <li>
+      <div class="right-panel">
+        <ul>
+          <li>Planner</li>
+          <li>Settings</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+
+
+</div>
+
+<p>Hello {{ name }} from child!</p>
