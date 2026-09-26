@@ -1,22 +1,11 @@
-# Frontend Dockerfile
+FROM node:alpine
 
-# Choose image and rename
-FROM --platform=$BUILDPLATFORM node:jod-trixie-slim as builder
+WORKDIR /usr/src/app
 
-# Create "frontend" directory and set as working directory
-WORKDIR /frontend
+COPY . /usr/src/app
 
-# Install Angualr CLI version 13 using npm
-RUN npm install -g @angular/cli@13
+RUN npm install -g @angular/cli
 
-# Copy package files into remote frontend directory
-COPY package.json package-lock.json ./
+RUN npm install
 
-# Install node modules from package-lock.json
-RUN npm ci
-
-# Copy remaining files in current directory to remote frontend directory
-COPY . .
-
-# Set default command to run when the container starts
-RUN ["ng", "server", "--host", "0.0.0.0"]
+CMD ["ng", "serve", "--host", "0.0.0.0"]

@@ -1,0 +1,10 @@
+services:
+  my-app:
+    build: ./frontend
+    ports:
+      - "4200:4200"
+    networks:
+      - silly
+networks:
+  silly:
+    driver: bridge
