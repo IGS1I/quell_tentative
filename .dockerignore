@@ -1,0 +1,53 @@
+# Node and Build Output
+
+node_modules
+dist
+out-tsc
+.angular
+.cache
+.tmp
+
+# Testing and Coverage
+
+coverage
+jest
+cypress
+cypress/screenshots
+cypress/videos
+reports
+playwright-report
+.vite
+.vitepress
+
+# Environment and log files
+*.env*
+!*.env.production
+*.log
+*.tsbuildinfo
+
+# IDE & os-specific files
+
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+*.swp
+
+# Version control and CI files
+
+.git
+.gitignore
+
+# Docker and local orchestration
+
+Dockerfile
+Dockerfile.*
+.dockerignore
+docker-compose.yml
+docker-compose*.yml
+
+# Miscellaneous
+
+*.bak
+*.old
+*.tmp
