@@ -5,11 +5,16 @@ export interface FormSubmission<T> {
   data: T;
 }
 
+export enum FormMode {
+  Create,
+  Update,
+}
+
 @Component({
   template: '',
 })
 export abstract class CreationFormBase<T> {
-  private readonly http = inject(HttpClient);
+  public http = inject(HttpClient);
 
   abstract readonly endpoint: string;
 
@@ -20,8 +25,15 @@ export abstract class CreationFormBase<T> {
 
   abstract onSubmit(): void;
 
-  protected submit(data: T): void {
-    this.http.post(this.endpoint, data).subscribe();
+  protected submit(data: T, mode: FormMode = FormMode.Create): void {
+    switch (mode) {
+      case FormMode.Create:
+        this.http.post(this.endpoint, data).subscribe();
+        break;
+      case FormMode.Update:
+        this.http.put(this.endpoint, data).subscribe();
+        break;
+    }
     this.submitted.emit({ data });
   }
 }

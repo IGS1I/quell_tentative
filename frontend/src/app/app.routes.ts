@@ -13,5 +13,7 @@ export const routes: Routes = [
   { path: 'task-create-test', component: TaskFormComponent },
   { path: 'work-create-test', component: WorkScheduleFormComponent },
   { path: 'active-task', component: ActiveTaskComponent },
-  { path: 'task-selector', component: TaskSelectorComponent }
+  { path: 'task-selector', component: TaskSelectorComponent },
+
+  { path: "create/task/:id", component: TaskFormComponent, pathMatch: "full" },
 ];

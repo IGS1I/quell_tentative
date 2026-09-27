@@ -3,13 +3,15 @@ import {AnalogClock} from '@myangularapps/analog-clock';
 import {WorkComponent} from '../../feature/work/work.component';
 import {WorkBlock} from '../../feature/work/model/work-block.model';
 import {WorkGroupService} from '../../feature/work/work-group.service';
+import {PomodoroComponent} from '../../feature/clock/pomodoro/pomodoro.component';
 
 @Component({
   selector: 'start-comp',
   standalone: true,
   imports: [
     AnalogClock,
-    WorkComponent
+    WorkComponent,
+    PomodoroComponent
   ],
   templateUrl: `./start.component.html`,
   styleUrl: `./start.component.scss`

@@ -1,0 +1,10 @@
+<p>Time so far: {{ getTimeAllocated() }} </p>
+<div style="position: relative; width: 400px; height: 120px;">
+  <svg width="400" height="120" class="bar" style="position: absolute; top: 0; left: 0;">
+    <rect x="10" y="10" width="200" height="100" stroke="red" stroke-width="6" fill="blue"/>
+  </svg>
+  <svg width="400" height="120" class="bar" style="position: absolute; top: 0; left: 0;">
+    <rect x="10" y="10" width="150" height="100" stroke="red" stroke-width="6" fill="blue"/>
+  </svg>
+</div>
+<button (click)="start()" [disabled]="isRunning">Start Task</button>

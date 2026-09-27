@@ -1,6 +1,8 @@
-import {Component, computed, signal} from '@angular/core';
+import {Component, computed, inject, signal} from '@angular/core';
 import {FormsModule} from '@angular/forms';
-import {CreationFormBase} from '../creation-form-base';
+import {CreationFormBase, FormMode} from '../creation-form-base';
+import {ActivatedRoute} from '@angular/router';
+import {HttpClient} from '@angular/common/http';
 
 export interface WorkScheduleFormData {
   groupName: string;
@@ -34,6 +36,28 @@ export class WorkScheduleFormComponent extends CreationFormBase<WorkScheduleForm
     return start !== '' && end !== '' && end <= start;
   });
 
+
+  readonly taskIdInURL: string | null;
+  private route = inject(ActivatedRoute);
+
+  constructor() {
+    super();
+    this.taskIdInURL = this.route.snapshot.paramMap.get('id');
+
+    if (this.taskIdInURL != null) {
+      // pull the API and fill the form
+      super['http'].get<WorkScheduleFormData>(`http://localhost:8080/api/group/${this.taskIdInURL}`).subscribe(data => {
+        this.name.set(data.groupName);
+        this.description.set(data.groupDescription);
+        this.recurring.set(data.recurring);
+        this.selectedDays.set(data.daysOfWeek);
+        this.startClockTime.set(data.startClockTime);
+        this.endClockTime.set(data.endClockTime);
+        this.scheduledDate.set(data.scheduledDate);
+      })
+    }
+  }
+
   readonly days = DAYS;
 
   toggleDay(day: string): void {
@@ -50,6 +74,10 @@ export class WorkScheduleFormComponent extends CreationFormBase<WorkScheduleForm
   }
 
   onSubmit(): void {
+    const mode = this.taskIdInURL != null ? FormMode.Update : FormMode.Create;
+    if (mode === FormMode.Update) {
+      this.endpoint = `http://localhost:8080/api/group/${this.taskIdInURL}`;
+    }
     this.submit({
       groupName: this.name(),
       groupDescription: this.description(),
@@ -58,6 +86,14 @@ export class WorkScheduleFormComponent extends CreationFormBase<WorkScheduleForm
       startClockTime: this.startClockTime(),
       endClockTime: this.endClockTime(),
       scheduledDate: this.scheduledDate(),
-    });
+    }, mode);
+  }
+
+  getSubmitButtonDisplay() {
+    if (this.taskIdInURL != null) {
+      return "Update";
+    } else {
+      return "Create";
+    }
   }
 }
