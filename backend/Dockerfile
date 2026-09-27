@@ -1,7 +1,14 @@
 # syntax=docker/dockerfile:1
 
+# JDK Stage
+FROM debian:trixie-slim AS jdk
+RUN apt-get update && apt-get install -y --no-install- recommends \
+    openjdk-21-jdk-headless \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
 # dev stage
-FROM eclipse-temurin:21-jdk AS dev
+FROM jdk AS dev
 WORKDIR /app
 COPY gradlew .
 COPY gradle gradle
@@ -14,7 +21,7 @@ COPY src src
 ENTRYPOINT ["./gradlew", "bootRun", "--no-daemon"]
 
 # build stage
-FROM eclipse-temurin:21-jdk AS build
+FROM jdk AS build
 WORKDIR /app
 COPY gradlew .
 COPY gradle gradle
@@ -27,8 +34,11 @@ COPY src src
 RUN --mount=type=cache,target=/root/.gradle \
     ./gradlew build -x test --no-daemon
 
-# prod
-FROM eclipse-temurin:21-jre AS prod
+# prod stage
+FROM jdk AS prod
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    openjdk-21-jre-headless \
+    && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=build /app/build/libs/*.jar app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]
