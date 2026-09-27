@@ -49,4 +49,8 @@
   border-top: 1px solid var(--border);
   padding: 0.5rem;
   box-sizing: border-box;
+
+  &.hidden {
+    display: none;
+  }
 }
