@@ -6,7 +6,7 @@ public record TaskDTO(
         String taskName,
         String taskDescription,
         String groupName,
-        boolean recurring,
+        boolean isRecurring,
         boolean isActive,
         List<String> daysOfWeek,
         String startClockTime,

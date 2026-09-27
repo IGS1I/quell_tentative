@@ -2,10 +2,10 @@ package dev.thesphere.quell.model;
 
 import dev.thesphere.quell.dto.TaskDTO;
 import jakarta.persistence.*;
-import jave.time.Instant;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stream.Collectors;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "tasks")
@@ -44,6 +44,23 @@ public class Task {
     @Column(nullable = false)
     private boolean isActive = true;
 
+    @Column(nullable = false)
+    private String startClockTime;
+    private String endClockTime;
+    private String scheduledDate;
+
+    // Task Priority
+    @Column(nullable = false)
+    private String priority;
+
+    // Time to spend on a break
+    @Column(nullable = false)
+    private int breakMinutes;
+
+    // Time to spend working
+    @Column(nullable = false)
+    private int workMinutes;
+
     // Functions for generating DTO
     @PrePersist
     private void prePersist() {
@@ -78,17 +95,17 @@ public class Task {
     public int getWorkMinutes() { return workMinutes; }
     public void setWorkMinutes(int workMinutes) { this.workMinutes = workMinutes; }
 
-    public TaskDTO replaceDTO(TaskDTO dto) {
+    public Task replaceDTO(TaskDTO dto) {
         this.taskName = dto.taskName();
         this.taskDescription = dto.taskDescription();
-        this.isRecurring = dto.recurring();
+        this.isRecurring = dto.isRecurring();
         this.isActive = dto.isActive();
         this.startClockTime = dto.startClockTime();
         this.endClockTime = dto.endClockTime();
         this.priority = dto.priority();
         this.breakMinutes = dto.breakMinutes();
         this.workMinutes = dto.workMinutes();
-        if (dto.recurring() && dto.daysOfWeek() != null) {
+        if (dto.isRecurring() && dto.daysOfWeek() != null) {
             this.daysOfWeek = dto.daysOfWeek().stream()
                     .map(DaysOfWeek::valueOf)
                     .collect(Collectors.toList());

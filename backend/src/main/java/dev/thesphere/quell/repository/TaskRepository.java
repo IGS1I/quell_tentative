@@ -1,6 +1,6 @@
-package dev.sphere.quell.repository;
+package dev.thesphere.quell.repository;
 
-import dev.sphere.quell.model.Task;
+import dev.thesphere.quell.model.Task;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TaskRepository extends JpaRepository<Task, Long> {
