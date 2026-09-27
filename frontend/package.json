@@ -20,6 +20,7 @@
     "@angular/router": "^22.2.0",
     "@myangularapps/analog-clock": "^1.0.18",
     "rxjs": "~7.8.0",
+    "simple-keyboard": "^3.8.192",
     "tslib": "^2.3.0"
   },
   "devDependencies": {

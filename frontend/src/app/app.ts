@@ -1,11 +1,12 @@
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { AlarmSchedulerService } from './feature/reward/alarm-scheduler.service';
+import { KeyboardComponent } from './feature/keyboard/keyboard.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
-  template: '<router-outlet />',
+  imports: [RouterOutlet, KeyboardComponent],
+  template: '<router-outlet /><app-keyboard />',
 })
 export class App {
   constructor() {
