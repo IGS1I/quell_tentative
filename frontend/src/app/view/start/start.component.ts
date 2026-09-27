@@ -1,7 +1,8 @@
-import {Component, Input} from '@angular/core';
+import {Component, Input, OnInit, signal} from '@angular/core';
 import {AnalogClock} from '@myangularapps/analog-clock';
 import {WorkComponent} from '../../feature/work/work.component';
-import {WorkBlock} from '../../feature/work/dto/work-block.model';
+import {WorkBlock} from '../../feature/work/model/work-block.model';
+import {WorkGroupService} from '../../feature/work/work-group.service';
 
 @Component({
   selector: 'start-comp',
@@ -13,13 +14,19 @@ import {WorkBlock} from '../../feature/work/dto/work-block.model';
   templateUrl: `./start.component.html`,
   styleUrl: `./start.component.scss`
 })
-export class StartComponent {
+export class StartComponent implements OnInit {
 
-  workBlocks: WorkBlock[] = [
-    new WorkBlock('test title 1', ["test12", "test22", "test13"]),
-    new WorkBlock('test title 2', ["test1212", "tes42t22", "t12est13"])
-
-  ];
+  workBlocks = signal<WorkBlock[]>([]);
 
   @Input() name = '';
+
+  constructor(private workGroupService: WorkGroupService) {}
+
+  ngOnInit(): void {
+    this.workGroupService.getAll().subscribe(blocks => {
+      this.workBlocks.set(blocks);
+    });
+  }
+
+  protected readonly Date = Date;
 }

@@ -23,6 +23,13 @@ public class WorkGroupController {
         return ResponseEntity.ok(service.create(dto));
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<WorkGroup> update(@RequestBody WorkGroupDTO dto, @PathVariable Long id) {
+        return service.findById(id)
+                .map(wg -> ResponseEntity.ok(service.save(wg.replaceDTO(dto))))
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<WorkGroup> get(@PathVariable Long id) {
         return service.findById(id)

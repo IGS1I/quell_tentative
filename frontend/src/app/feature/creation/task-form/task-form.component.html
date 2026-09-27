@@ -1,0 +1,13 @@
+<form (ngSubmit)="onSubmit()">
+  <label>
+    Name
+    <input type="text" [ngModel]="name()" (ngModelChange)="name.set($event)" name="name" required>
+  </label>
+
+  <label>
+    Description
+    <input type="text" [ngModel]="description()" (ngModelChange)="description.set($event)" name="description">
+  </label>
+
+  <button type="submit">Create</button>
+</form>

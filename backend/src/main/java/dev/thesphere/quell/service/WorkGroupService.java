@@ -19,13 +19,16 @@ public class WorkGroupService {
 
     public WorkGroup create(WorkGroupDTO dto) {
         WorkGroup wg = new WorkGroup();
-        wg.setGroupName(dto.groupName());
-        wg.setGroupDescription(dto.groupDescription());
+        wg.replaceDTO(dto);
         return repository.save(wg);
     }
 
     public Optional<WorkGroup> findById(Long id) {
         return repository.findById(id);
+    }
+
+    public WorkGroup save(WorkGroup wg) {
+        return repository.save(wg);
     }
 
     public List<WorkGroup> findAll() {

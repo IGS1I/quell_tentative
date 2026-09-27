@@ -1,0 +1,48 @@
+<form (ngSubmit)="onSubmit()">
+  <label>
+    Name
+    <input type="text" [ngModel]="name()" (ngModelChange)="name.set($event)" name="name" required>
+  </label>
+
+  <label>
+    Description
+    <input type="text" [ngModel]="description()" (ngModelChange)="description.set($event)" name="description">
+  </label>
+
+  <label>
+    Recurring
+    <input type="checkbox" [ngModel]="recurring()" (ngModelChange)="recurring.set($event); scheduledDate.set('')" name="recurring">
+  </label>
+
+  @if (recurring()) {
+    <fieldset>
+      <legend>Days</legend>
+      @for (day of days; track day) {
+        <label>
+          <input type="checkbox" [checked]="isDaySelected(day)" (change)="toggleDay(day)">
+          {{ day }}
+        </label>
+      }
+    </fieldset>
+  } @else {
+    <label>
+      Date
+      <input type="date" [ngModel]="scheduledDate()" (ngModelChange)="scheduledDate.set($event)" name="scheduledDate">
+    </label>
+  }
+
+  <label>
+    Start Time
+    <input type="time" [ngModel]="startClockTime()" (ngModelChange)="startClockTime.set($event)" name="startClockTime">
+  </label>
+
+  <label>
+    End Time
+    <input type="time" [ngModel]="endClockTime()" (ngModelChange)="endClockTime.set($event)" name="endClockTime">
+    @if (isNextDay()) {
+      <span>(next day)</span>
+    }
+  </label>
+
+  <button type="submit">Create</button>
+</form>

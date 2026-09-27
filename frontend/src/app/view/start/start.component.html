@@ -10,8 +10,8 @@
     </li>
     <li>
       <div class="work-blocks">
-        @for (workBlock of workBlocks; track workBlock.name) {
-          <work-comp [name]="workBlock.name" [taskTitles]="workBlock.taskTitles" />
+        @for (workBlock of workBlocks(); track workBlock.id) {
+          <work-comp [workBlock]="workBlock"/>
         }
       </div>
     </li>

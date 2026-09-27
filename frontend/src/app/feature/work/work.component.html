@@ -1,6 +1,8 @@
 <!-- this should be a rectangle box that has the titles of all associated tasks -->
 
-<h1>{{ name }}</h1>
-<div class="work-block-content" *ngFor="let taskTitle of taskTitles">
-  <p> {{ taskTitle }}</p>
+<div class="work-block-holder">
+  <h1>{{ workBlock?.groupName }}</h1>
+  @if (workBlock?.groupDescription) {
+    <p>{{ workBlock?.groupDescription }}</p>
+  }
 </div>
