@@ -27,9 +27,11 @@ export class KeyboardComponent implements AfterViewInit, OnDestroy {
   private activeInput: HTMLInputElement | HTMLTextAreaElement | null = null;
 
   constructor() {
-    // Capture-phase listeners to prevent any click inside from stealing focus
+    // Capture-phase preventDefault stops keyboard keys from stealing focus,
+    // but we skip it for the toggle button so its click event still fires.
     const prevent = (e: Event) => {
-      console.log('[keyboard] capture prevent', e.type, (e.target as HTMLElement)?.tagName);
+      const target = e.target as HTMLElement;
+      if (target.closest('.keyboard-toggle')) return;
       e.preventDefault();
     };
     this.el.nativeElement.addEventListener('pointerdown', prevent, { capture: true });
@@ -62,7 +64,6 @@ export class KeyboardComponent implements AfterViewInit, OnDestroy {
   @HostListener('document:focusin', ['$event'])
   onFocusIn(e: FocusEvent): void {
     const target = e.target as HTMLElement;
-    console.log('[keyboard] focusin', target.tagName, target.className, 'inside?', this.el.nativeElement.contains(target));
     if (this.el.nativeElement.contains(target)) return;
 
     if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) {
@@ -76,8 +77,6 @@ export class KeyboardComponent implements AfterViewInit, OnDestroy {
   }
 
   protected toggleKeyboard(): void {
-    console.log('[keyboard] toggleKeyboard, currently visible:', this.visible());
-    console.trace('[keyboard] toggle stack');
     if (this.visible()) {
       this.visible.set(false);
       this.enabled.set(false);
@@ -104,7 +103,6 @@ export class KeyboardComponent implements AfterViewInit, OnDestroy {
   }
 
   private onKeyPress(button: string): void {
-    console.log('[keyboard] onKeyPress', button, 'visible:', this.visible());
     if (button === '{shift}' || button === '{lock}') {
       const currentLayout = this.keyboard.options.layoutName;
       this.keyboard.setOptions({
