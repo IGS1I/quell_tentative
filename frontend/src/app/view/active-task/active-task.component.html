@@ -1,8 +1,14 @@
 <main class="active">
   <header>
-    <a routerLink="/" class="ghost button">&larr; Home</a>
-    <span class="time">{{ now() | date: 'h:mm a' }}</span>
+<span class="time">{{ now() | date: 'h:mm a' }}</span>
   </header>
+
+  @if (group(); as g) {
+    <div class="work-group-banner">
+      <strong>{{ g.groupName }}</strong>
+      <span class="muted">{{ g.startClockTime }} – {{ g.endClockTime }}</span>
+    </div>
+  }
 
   @if (task(); as t) {
     <section class="card">

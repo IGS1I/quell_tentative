@@ -14,7 +14,7 @@ export class PomodoroService {
   }
 
   stop(): Observable<void> {
-    return this.http.delete<void>(this.url);
+    return this.http.delete<void>(this.url, { responseType: 'text' as 'json' });
   }
 
   /** Emits null when no session is running (empty body or an error response). */

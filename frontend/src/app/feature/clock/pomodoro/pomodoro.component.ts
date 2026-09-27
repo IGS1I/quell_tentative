@@ -1,11 +1,9 @@
 import { Component, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { NowService } from '../../../core/now.service';
 import { AlarmService } from '../../reward/alarm.service';
-import { PomodoroSession } from './pomodoro-session.model';
+import { PomodoroSession, PomodoroState } from './pomodoro-session.model';
 
-const SNOOZE_MINUTES = 5;
-
-/** Countdown progress bar for the running Pomodoro. Shows a snooze button once time is up. */
+/** Countdown timer that cycles work → break → work → break … until the task is ended. */
 @Component({
   selector: 'app-pomodoro',
   templateUrl: './pomodoro.component.html',
@@ -15,19 +13,30 @@ export class PomodoroComponent {
   readonly session = input.required<PomodoroSession>();
   readonly timeUp = output<void>();
 
-  protected readonly snoozeMinutes = SNOOZE_MINUTES;
   private readonly now = inject(NowService).now;
   protected readonly alarmService = inject(AlarmService);
-  private readonly snoozed = signal(0);
 
-  protected readonly totalMinutes = computed(() => this.session().workMinutes + this.snoozed());
+  /** Current phase: WORK or BREAK. */
+  protected readonly phase = signal<PomodoroState>('WORK');
+  /** Epoch ms when the current phase started. */
+  private readonly phaseStart = signal(0);
+  /** How many full work cycles have completed. */
+  protected readonly cycle = signal(1);
+  /** True while waiting for user to confirm the next phase. */
+  protected readonly waiting = signal(false);
+
+  protected readonly phaseMinutes = computed(() =>
+    this.phase() === 'WORK' ? this.session().workMinutes : this.session().breakMinutes,
+  );
 
   private readonly remainingMs = computed(() => {
-    const end = new Date(this.session().startedAt).getTime() + this.totalMinutes() * 60_000;
+    const end = this.phaseStart() + this.phaseMinutes() * 60_000;
     return Math.max(0, end - this.now().getTime());
   });
 
-  protected readonly remainingPercent = computed(() => (this.remainingMs() / (this.totalMinutes() * 60_000)) * 100);
+  protected readonly remainingPercent = computed(() =>
+    this.phaseMinutes() > 0 ? (this.remainingMs() / (this.phaseMinutes() * 60_000)) * 100 : 0,
+  );
   protected readonly finished = computed(() => this.remainingMs() === 0);
 
   protected readonly remainingLabel = computed(() => {
@@ -36,19 +45,39 @@ export class PomodoroComponent {
   });
 
   constructor() {
-    // Cue: chime once each time the countdown reaches zero.
+    // Reset everything when a new session is provided.
     effect(() => {
-      if (this.finished()) {
+      const session = this.session();
+      untracked(() => {
+        this.phase.set('WORK');
+        this.phaseStart.set(new Date(session.startedAt).getTime());
+        this.cycle.set(1);
+        this.waiting.set(false);
+      });
+    });
+
+    // Chime when the current phase countdown reaches zero.
+    effect(() => {
+      if (this.finished() && !this.waiting()) {
         untracked(() => {
           this.alarmService.play();
+          this.waiting.set(true);
           this.timeUp.emit();
         });
       }
     });
   }
 
-  protected snooze(): void {
+  /** User confirms — advance to the next phase. */
+  protected continueToNext(): void {
     this.alarmService.stop();
-    this.snoozed.update((m) => m + SNOOZE_MINUTES);
+    if (this.phase() === 'WORK') {
+      this.phase.set('BREAK');
+    } else {
+      this.phase.set('WORK');
+      this.cycle.update((c) => c + 1);
+    }
+    this.phaseStart.set(Date.now());
+    this.waiting.set(false);
   }
 }

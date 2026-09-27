@@ -1,16 +1,17 @@
-<div class="pomodoro" [class.done]="finished()">
+<div class="pomodoro" [class.break]="phase() === 'BREAK'" [class.done]="waiting()">
+  <span class="phase">{{ phase() === 'WORK' ? 'Work' : 'Break' }} &middot; Cycle {{ cycle() }}</span>
   <div class="bar" role="progressbar" [attr.aria-valuenow]="remainingPercent()" aria-valuemin="0" aria-valuemax="100">
     <div class="fill" [style.width.%]="remainingPercent()"></div>
     <span class="left">{{ remainingLabel() }}</span>
   </div>
-  <span class="total">{{ totalMinutes() }} mins</span>
+  <span class="total">{{ phaseMinutes() }} mins</span>
 </div>
-@if (finished()) {
+@if (waiting()) {
   <div class="ended">
-    <span>Time's up.</span>
+    <span>{{ phase() === 'WORK' ? 'Work phase done — take a break!' : 'Break over — back to work!' }}</span>
     @if (alarmService.ringing()) {
       <button type="button" class="stop-alarm" (click)="alarmService.stop()">Stop alarm</button>
     }
-    <button type="button" class="secondary" (click)="snooze()">Snooze {{ snoozeMinutes }} min</button>
+    <button type="button" (click)="continueToNext()">{{ phase() === 'WORK' ? 'Start break' : 'Start work' }}</button>
   </div>
 }
