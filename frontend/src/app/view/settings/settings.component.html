@@ -1,0 +1,70 @@
+<main class="settings">
+  <header>
+    <a routerLink="/" class="ghost button">&larr; Home</a>
+    <h1>Settings</h1>
+  </header>
+
+  <!-- Alarm -->
+  <section class="card">
+    <h2>Alarm</h2>
+    <p class="muted">Plays a chime when a work block starts or ends.</p>
+    <label class="inline">
+      <input type="checkbox" [checked]="alarm.enabled()" (change)="alarm.toggle()" />
+      Enable alarm sounds
+    </label>
+    <div>
+      <button type="button" class="ghost" (click)="alarm.preview()">Test alarm</button>
+    </div>
+  </section>
+
+  <!-- Work blocks -->
+  <section class="card">
+    <div class="section-head">
+      <h2>Work Blocks</h2>
+      <a class="button" routerLink="/create/work">+ New</a>
+    </div>
+
+    @for (group of groups(); track group.id) {
+      <div class="row">
+        <div class="row-info">
+          <strong>{{ group.groupName }}</strong>
+          <span class="muted">{{ group.startClockTime }} &ndash; {{ group.endClockTime }}</span>
+        </div>
+        <div class="row-actions">
+          <a class="ghost button" [routerLink]="['/edit/work', group.id]">Edit</a>
+          <button type="button" class="ghost danger" (click)="deleteGroup(group)">Delete</button>
+        </div>
+      </div>
+    } @empty {
+      <p class="muted">No work blocks yet. <a routerLink="/create/work">Add one</a>.</p>
+    }
+  </section>
+
+  <!-- Tasks -->
+  <section class="card">
+    <h2>Tasks</h2>
+
+    @if (loading()) {
+      <p class="muted">Loading&hellip;</p>
+    } @else if (!tasks().length) {
+      <p class="muted">No tasks yet.</p>
+    } @else {
+      @for (group of groups(); track group.id) {
+        @if (tasksForGroup(group.id!).length) {
+          <div class="task-group">
+            <h3>{{ group.groupName }}</h3>
+            @for (task of tasksForGroup(group.id!); track task.uuid) {
+              <div class="row">
+                <span>{{ task.taskTitle }}</span>
+                <div class="row-actions">
+                  <a class="ghost button" [routerLink]="['/edit/task', task.uuid]">Edit</a>
+                  <button type="button" class="ghost danger" (click)="deleteTask(task.uuid!, task.taskTitle)">Delete</button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      }
+    }
+  </section>
+</main>

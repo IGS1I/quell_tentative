@@ -1,7 +1,45 @@
-h1 {
-    text-align: center;
+.planner { padding: 2rem 1rem; max-width: 80rem; margin: 0 auto; }
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
-html {
-    background-color: #edeaff;
+.range { display: flex; align-items: center; gap: 0.5rem; h1 { margin: 0; font-size: 1.3rem; } }
+
+.week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0.75rem; }
+
+.day {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 12rem;
+  padding: 0.75rem;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  &.today { border-color: var(--accent); }
+  h2 { margin: 0 0 0.25rem; font-size: 0.95rem; }
+}
+
+.block {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem;
+  border-radius: calc(var(--radius) / 2);
+  background: var(--accent-soft);
+  color: var(--text);
+  text-decoration: none;
+  font-size: 0.9rem;
+  span { font-size: 0.75rem; }
+}
+
+.free { font-size: 0.85rem; }
+
+@media (max-width: 760px) {
+  .week { grid-template-columns: 1fr; }
+  .day { min-height: auto; }
 }

@@ -1,48 +1,68 @@
-<form (ngSubmit)="onSubmit()">
+<form class="creation-form" [formGroup]="form" (ngSubmit)="submit()">
+  <h1>{{ editId() ? 'Edit work block' : 'New work block' }}</h1>
+
   <label>
     Name
-    <input type="text" [ngModel]="name()" (ngModelChange)="name.set($event)" name="name" required>
+    <input formControlName="groupName" placeholder="Deep work" autofocus />
   </label>
-
-  <label>
-    Description
-    <input type="text" [ngModel]="description()" (ngModelChange)="description.set($event)" name="description">
-  </label>
-
-  <label>
-    Recurring
-    <input type="checkbox" [ngModel]="recurring()" (ngModelChange)="recurring.set($event); scheduledDate.set('')" name="recurring">
-  </label>
-
-  @if (recurring()) {
-    <fieldset>
-      <legend>Days</legend>
-      @for (day of days; track day) {
-        <label>
-          <input type="checkbox" [checked]="isDaySelected(day)" (change)="toggleDay(day)">
-          {{ day }}
-        </label>
-      }
-    </fieldset>
-  } @else {
-    <label>
-      Date
-      <input type="date" [ngModel]="scheduledDate()" (ngModelChange)="scheduledDate.set($event)" name="scheduledDate">
-    </label>
+  @if (form.controls.groupName.touched && form.controls.groupName.invalid) {
+    <span class="field-error">A name is required.</span>
   }
 
   <label>
-    Start Time
-    <input type="time" [ngModel]="startClockTime()" (ngModelChange)="startClockTime.set($event)" name="startClockTime">
+    Description
+    <input formControlName="groupDescription" placeholder="Optional" />
   </label>
 
-  <label>
-    End Time
-    <input type="time" [ngModel]="endClockTime()" (ngModelChange)="endClockTime.set($event)" name="endClockTime">
-    @if (isNextDay()) {
-      <span>(next day)</span>
+  <div class="grid-2">
+    <label>
+      Starts
+      <input type="time" formControlName="startClockTime" />
+    </label>
+    <label>
+      Ends
+      <input type="time" formControlName="endClockTime" />
+    </label>
+  </div>
+
+  <label class="inline">
+    <input type="checkbox" formControlName="recurring" />
+    Repeats weekly
+  </label>
+
+  @if (form.controls.recurring.value) {
+    <div class="days">
+      @for (day of days; track day) {
+        <button
+          type="button"
+          class="day"
+          [class.on]="form.controls.daysOfWeek.value.includes(day)"
+          (click)="toggleDay(day)"
+        >
+          {{ day.slice(0, 3) }}
+        </button>
+      }
+    </div>
+  } @else {
+    <label>
+      Date
+      <input type="date" formControlName="scheduledDate" />
+    </label>
+  }
+
+  @if (error()) {
+    <p class="field-error">{{ error() }}</p>
+  }
+
+  <div class="actions">
+    @if (editId()) {
+      <button type="button" class="ghost danger" (click)="deleteGroup()">Delete</button>
+      <a class="button ghost" routerLink="/settings">Cancel</a>
+    } @else {
+      <a class="button ghost" routerLink="/">Cancel</a>
     }
-  </label>
-
-  <button type="submit">{{ getSubmitButtonDisplay() }}</button>
+    <button type="submit" [disabled]="saving()">
+      {{ saving() ? 'Saving\u2026' : (editId() ? 'Save changes' : 'Save block') }}
+    </button>
+  </div>
 </form>

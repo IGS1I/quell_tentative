@@ -1,0 +1,48 @@
+.selector { max-width: 60rem; margin: 0 auto; padding: 2rem 1rem; }
+
+header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  > div { flex: 1; }
+  h1 { margin: 0; font-size: 1.5rem; }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  gap: 1rem;
+}
+
+.empty {
+  grid-column: 1 / -1;
+  display: grid;
+  place-items: center;
+  gap: 0.5rem;
+  padding: 3rem;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  color: var(--muted);
+  p { margin: 0; }
+}
+
+.all-done {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.completed {
+  margin-top: 2rem;
+  opacity: 0.55;
+}
+
+.completed-heading {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 0.75rem;
+}

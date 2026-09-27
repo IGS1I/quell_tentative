@@ -1,10 +1,16 @@
-<p>Time so far: {{ getTimeAllocated() }} </p>
-<div style="position: relative; width: 400px; height: 120px;">
-  <svg width="400" height="120" class="bar" style="position: absolute; top: 0; left: 0;">
-    <rect x="10" y="10" width="200" height="100" stroke="red" stroke-width="6" fill="blue"/>
-  </svg>
-  <svg width="400" height="120" class="bar" style="position: absolute; top: 0; left: 0;">
-    <rect x="10" y="10" width="150" height="100" stroke="red" stroke-width="6" fill="blue"/>
-  </svg>
+<div class="pomodoro" [class.done]="finished()">
+  <div class="bar" role="progressbar" [attr.aria-valuenow]="remainingPercent()" aria-valuemin="0" aria-valuemax="100">
+    <div class="fill" [style.width.%]="remainingPercent()"></div>
+    <span class="left">{{ remainingLabel() }}</span>
+  </div>
+  <span class="total">{{ totalMinutes() }} mins</span>
 </div>
-<button (click)="start()" [disabled]="isRunning">Start Task</button>
+@if (finished()) {
+  <div class="ended">
+    <span>Time's up.</span>
+    @if (alarmService.ringing()) {
+      <button type="button" class="stop-alarm" (click)="alarmService.stop()">Stop alarm</button>
+    }
+    <button type="button" class="secondary" (click)="snooze()">Snooze {{ snoozeMinutes }} min</button>
+  </div>
+}

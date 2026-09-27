@@ -1,0 +1,38 @@
+<main class="browser">
+  <header>
+    <button type="button" class="ghost button" (click)="location.back()">&larr; Back</button>
+    <div>
+      <h1>{{ group()?.groupName ?? 'Work block' }}</h1>
+      @if (group(); as g) {
+        <span class="muted">{{ g.startClockTime }} &ndash; {{ g.endClockTime }}</span>
+      }
+    </div>
+    <a class="button" [routerLink]="['/create/task', groupId]">+ Task</a>
+  </header>
+
+  <p class="helper muted">Click a task to edit</p>
+
+  @if (loading()) {
+    <p class="muted">Loading tasks&hellip;</p>
+  } @else {
+    <section class="list">
+      @for (task of tasks(); track task.uuid) {
+        <a class="task-row" [routerLink]="['/edit/task', task.uuid]">
+          <span class="priority" [attr.data-level]="task.priority">P{{ task.priority }}</span>
+          <div class="info">
+            <strong>{{ task.taskTitle }}</strong>
+            @if (task.taskDetails) {
+              <p>{{ task.taskDetails }}</p>
+            }
+          </div>
+          <small class="muted">{{ task.pomodoroMinutes }} min &middot; {{ task.completableItems.length }} items</small>
+        </a>
+      } @empty {
+        <div class="empty">
+          <p>No tasks in this block yet.</p>
+          <a class="button" [routerLink]="['/create/task', groupId]">Add the first one</a>
+        </div>
+      }
+    </section>
+  }
+</main>

@@ -1,0 +1,42 @@
+<main class="selector">
+  <header>
+    <a routerLink="/" class="ghost button">&larr; Back</a>
+    <div>
+      <h1>{{ group()?.groupName ?? 'Work block' }}</h1>
+      @if (group(); as g) {
+        <span class="muted">{{ g.startClockTime }} &ndash; {{ g.endClockTime }} &middot; {{ hasActive() ? 'resume your active task' : 'pick a task to focus on' }}</span>
+      }
+    </div>
+    <a class="button" [routerLink]="['/create/task', groupId]">+ Task</a>
+  </header>
+
+  @if (loading()) {
+    <p class="muted">Loading tasks&hellip;</p>
+  } @else {
+    <section class="grid">
+      @for (task of pendingTasks(); track task.uuid) {
+        <app-task [task]="task" [locked]="hasActive() && !task.isActive" (picked)="pick($event)" />
+      } @empty {
+        @if (completedTasks().length === 0) {
+          <div class="empty">
+            <p>No tasks in this block yet.</p>
+            <a class="button" [routerLink]="['/create/task', groupId]">Add the first one</a>
+          </div>
+        } @else {
+          <p class="muted all-done">All tasks complete!</p>
+        }
+      }
+    </section>
+
+    @if (completedTasks().length > 0) {
+      <section class="completed">
+        <h2 class="completed-heading">Completed today</h2>
+        <div class="grid">
+          @for (task of completedTasks(); track task.uuid) {
+            <app-task [task]="task" [locked]="true" (picked)="pick($event)" />
+          }
+        </div>
+      </section>
+    }
+  }
+</main>

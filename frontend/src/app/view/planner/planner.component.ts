@@ -1,33 +1,47 @@
-import {Component, Input} from '@angular/core';
+import { DatePipe } from '@angular/common';
+import { Component, computed, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { NowService } from '../../core/now.service';
+import { isoDate } from '../../core/time';
+import { WorkGroup } from '../../feature/work/work-group.model';
+import { WorkGroupService } from '../../feature/work/work-group.service';
 
+/** Week overview (Mon-Sun) of every scheduled work block. */
 @Component({
-  selector: 'planner-comp',
-  standalone: true,
-  imports: [
-  ],
-  templateUrl: `./planner.component.html`,
-  styleUrl: `./planner.component.scss`
+  selector: 'app-planner',
+  imports: [DatePipe, RouterLink],
+  templateUrl: './planner.component.html',
+  styleUrl: './planner.component.scss',
 })
-
 export class PlannerComponent {
-  @Input() name = '';
-  shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  private readonly groupService = inject(WorkGroupService);
+  private readonly now = inject(NowService).now;
 
-startOfWeek(date: Date) {
-  // Calculate the difference between the date's day of the month and its day of the week
-  var diff = date.getDate() - date.getDay() + (date.getDay() === 0 ? -6 : 1);
+  /** 0 = this week, -1 = last week, 1 = next week. */
+  protected readonly weekOffset = signal(0);
+  protected readonly today = isoDate(new Date());
 
-  // Set the date to the start of the week by setting it to the calculated difference
-  return new Date(date.setDate(diff));
-}
+  protected blockIsNow(block: WorkGroup, dayIso: string): boolean {
+    if (dayIso !== this.today) return false;
+    const [sh, sm] = block.startClockTime.split(':').map(Number);
+    const [eh, em] = block.endClockTime.split(':').map(Number);
+    const n = this.now();
+    const nowMin = n.getHours() * 60 + n.getMinutes();
+    return nowMin >= sh * 60 + sm && nowMin < eh * 60 + em;
+  }
 
-curr_day = new Date();
+  protected readonly days = computed(() => {
+    const monday = new Date();
+    monday.setHours(0, 0, 0, 0);
+    monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7) + this.weekOffset() * 7);
+    return Array.from({ length: 7 }, (_, i) => {
+      const date = new Date(monday);
+      date.setDate(monday.getDate() + i);
+      return { date, iso: isoDate(date), blocks: WorkGroupService.onDate(this.groupService.groups(), date) };
+    });
+  });
 
-endOfWeek() {
-    let month = this.curr_day.getMonth() + 1;
-    const monthStr = this.shortMonths[month - 1];
-    const dayNum = this.startOfWeek(this.curr_day).getDate() + 6;
-    const year = this.curr_day.getFullYear();
-    return `Sun ${monthStr} ${dayNum} ${year}`;
+  constructor() {
+    this.groupService.load();
   }
 }

@@ -1,7 +1,95 @@
-.container {
-  display: flex;
+.start {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    'clock top'
+    'clock blocks'
+    'clock bottom';
+  gap: 0.75rem 2.5rem;
+  height: 100dvh;
+  padding: 1.5rem 2rem;
+  box-sizing: border-box;
 }
 
-.clock-view {
+app-clock { grid-area: clock; align-self: center; }
 
+.top {
+  grid-area: top;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1.5rem;
+
+  a { font-size: 1rem; font-weight: 500; }
+}
+
+.bottom {
+  grid-area: bottom;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+
+  a { font-size: 1rem; font-weight: 500; }
+}
+
+.alarm-bar {
+  grid-area: alarm;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  font-weight: 500;
+  font-size: 1.05rem;
+}
+
+.stop-alarm {
+  background: var(--danger);
+  color: #fff;
+  flex-shrink: 0;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Three tall work blocks filling available height. */
+.blocks {
+  grid-area: blocks;
+  display: flex;
+  gap: 1.25rem;
+  align-items: stretch;
+
+  > app-work { flex: 1 1 0; min-width: 0; }
+}
+
+.empty {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  gap: 0.75rem;
+  padding: 2rem;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  color: var(--muted);
+  font-size: 1.1rem;
+  p { margin: 0; }
+}
+
+@media (max-width: 760px) {
+  .start {
+    grid-template-columns: 1fr;
+    grid-template-areas: 'top' 'clock' 'blocks' 'alarm' 'bottom';
+    height: auto;
+    min-height: 100dvh;
+    padding: 1rem;
+  }
+  .blocks { flex-direction: column; }
 }

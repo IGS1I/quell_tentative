@@ -1,0 +1,68 @@
+<main class="active">
+  <header>
+    <a routerLink="/" class="ghost button">&larr; Home</a>
+    <span class="time">{{ now() | date: 'h:mm a' }}</span>
+  </header>
+
+  @if (task(); as t) {
+    <section class="card">
+      <h1>{{ t.taskTitle }}</h1>
+      @if (t.taskDetails) {
+        <p class="details">{{ t.taskDetails }}</p>
+      }
+
+      @if (t.completableItems.length) {
+        <ul class="items">
+          @for (item of t.completableItems; track $index) {
+            <li>
+              <label [class.done]="item.done">
+                <input type="checkbox" [checked]="item.done" (change)="toggleItem($index)" />
+                {{ item.label }}
+              </label>
+            </li>
+          }
+        </ul>
+      }
+
+      @if (started() && session(); as s) {
+        @if (!reward()) {
+          <app-pomodoro [session]="s" />
+        }
+      }
+
+      <div class="actions">
+        <button type="button" class="end" (click)="askToEnd()">End task</button>
+      </div>
+    </section>
+
+    @if (reward()) {
+      <div class="reward" role="status">
+        <strong>{{ t.taskTitle }} is done</strong>
+        <p>{{ reward() }}</p>
+      </div>
+    }
+  } @else {
+    <p class="muted">Loading task&hellip;</p>
+  }
+
+  <!-- Shown automatically when the task loads and no session is resuming. -->
+  <dialog #startConfirm class="confirm">
+    @if (task(); as t) {
+      <h2>Start "{{ t.taskTitle }}"?</h2>
+      <p class="muted">{{ t.pomodoroMinutes }} min work &middot; {{ t.breakMinutes }} min break</p>
+    }
+    <div class="actions">
+      <button type="button" class="ghost" (click)="declineStart()">Go back</button>
+      <button type="button" (click)="confirmStart()">Start Pomodoro</button>
+    </div>
+  </dialog>
+
+  <dialog #endConfirm class="confirm">
+    <h2>End this task?</h2>
+    <p class="muted">The timer stops and you head back.</p>
+    <div class="actions">
+      <button type="button" class="ghost" (click)="cancelEnd()">Keep going</button>
+      <button type="button" (click)="endTask()">End task</button>
+    </div>
+  </dialog>
+</main>

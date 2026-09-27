@@ -3,17 +3,14 @@ package dev.thesphere.quell.dto;
 import java.util.List;
 
 public record TaskDTO(
-        String taskName,
-        String taskDescription,
-        String groupName,
-        boolean isRecurring,
-        boolean isActive,
-        List<String> daysOfWeek,
-        String startClockTime,
-        String endClockTime,
-        String scheduledDate,
-        String priority,
+        String taskTitle,
+        String taskDetails,
+        Long workGroupId,
+        List<CompletableItemDTO> completableItems,
+        int pomodoroMinutes,
         int breakMinutes,
-        int workMinutes
+        int priority,
+        Boolean isActive
 ) {
+    public record CompletableItemDTO(String label, boolean done) {}
 }

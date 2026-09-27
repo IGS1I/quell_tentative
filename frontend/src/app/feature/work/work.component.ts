@@ -1,13 +1,23 @@
-import {Component, Input} from '@angular/core';
-import {WorkBlock} from './model/work-block.model';
+import { Component, computed, input } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { WorkGroup } from './work-group.model';
 
+/** One work block on the start screen; tapping it opens its task selector. */
 @Component({
-  selector: 'work-comp',
-  standalone: true,
-  imports: [],
-  // you can have the template call a separate HTML file
-  templateUrl: `./work.component.html`
+  selector: 'app-work',
+  imports: [RouterLink],
+  templateUrl: './work.component.html',
+  styleUrl: './work.component.scss',
 })
 export class WorkComponent {
-  @Input() workBlock?: WorkBlock;
+  readonly group = input.required<WorkGroup>();
+  /** Current time as minutes since midnight. */
+  readonly nowMinutes = input(0);
+
+  protected readonly isNow = computed(() => {
+    const [sh, sm] = this.group().startClockTime.split(':').map(Number);
+    const [eh, em] = this.group().endClockTime.split(':').map(Number);
+    const now = this.nowMinutes();
+    return now >= sh * 60 + sm && now < eh * 60 + em;
+  });
 }

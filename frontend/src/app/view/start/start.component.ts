@@ -1,34 +1,34 @@
-import {Component, Input, OnInit, signal} from '@angular/core';
-import {AnalogClock} from '@myangularapps/analog-clock';
-import {WorkComponent} from '../../feature/work/work.component';
-import {WorkBlock} from '../../feature/work/model/work-block.model';
-import {WorkGroupService} from '../../feature/work/work-group.service';
-import {PomodoroComponent} from '../../feature/clock/pomodoro/pomodoro.component';
+import { Component, computed, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { NowService } from '../../core/now.service';
+import { toMinutes } from '../../core/time';
+import { ClockComponent } from '../../feature/clock/clock.component';
+import { AlarmService } from '../../feature/reward/alarm.service';
+import { WorkComponent } from '../../feature/work/work.component';
+import { WorkGroupService } from '../../feature/work/work-group.service';
 
+/** Home: clock, the next three work blocks today, and nav. */
 @Component({
-  selector: 'start-comp',
-  standalone: true,
-  imports: [
-    AnalogClock,
-    WorkComponent,
-    PomodoroComponent
-  ],
-  templateUrl: `./start.component.html`,
-  styleUrl: `./start.component.scss`
+  selector: 'app-start',
+  imports: [ClockComponent, WorkComponent, RouterLink],
+  templateUrl: './start.component.html',
+  styleUrl: './start.component.scss',
 })
-export class StartComponent implements OnInit {
+export class StartComponent {
+  private readonly groupService = inject(WorkGroupService);
+  private readonly now = inject(NowService).now;
+  protected readonly alarm = inject(AlarmService);
 
-  workBlocks = signal<WorkBlock[]>([]);
+  protected readonly nowMinutes = computed(() => this.now().getHours() * 60 + this.now().getMinutes());
 
-  @Input() name = '';
+  /** Only three blocks, per the design: the current one and what's next today. */
+  protected readonly blocks = computed(() =>
+    WorkGroupService.onDate(this.groupService.groups(), this.now())
+      .filter((g) => toMinutes(g.endClockTime) > this.nowMinutes())
+      .slice(0, 3),
+  );
 
-  constructor(private workGroupService: WorkGroupService) {}
-
-  ngOnInit(): void {
-    this.workGroupService.getAll().subscribe(blocks => {
-      this.workBlocks.set(blocks);
-    });
+  constructor() {
+    this.groupService.load();
   }
-
-  protected readonly Date = Date;
 }

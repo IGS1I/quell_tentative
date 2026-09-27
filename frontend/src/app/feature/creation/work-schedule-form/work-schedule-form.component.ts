@@ -1,99 +1,89 @@
-import {Component, computed, inject, signal} from '@angular/core';
-import {FormsModule} from '@angular/forms';
-import {CreationFormBase, FormMode} from '../creation-form-base';
-import {ActivatedRoute} from '@angular/router';
-import {HttpClient} from '@angular/common/http';
+import { Component, inject, signal } from '@angular/core';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Observable } from 'rxjs';
+import { isoDate } from '../../../core/time';
+import { DAYS_OF_WEEK, DayOfWeek, WorkGroup } from '../../work/work-group.model';
+import { WorkGroupService } from '../../work/work-group.service';
+import { CreationFormBase } from '../creation-form-base';
 
-export interface WorkScheduleFormData {
-  groupName: string;
-  groupDescription: string;
-  recurring: boolean;
-  daysOfWeek: string[];
-  startClockTime: string;
-  endClockTime: string;
-  scheduledDate: string;
-}
-
-const DAYS = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
-
+/** Route: create/work (create) or edit/work/:id (edit). */
 @Component({
-  selector: 'work-schedule-form',
-  standalone: true,
-  imports: [FormsModule],
-  templateUrl: './work-schedule-form.component.html'
+  selector: 'app-work-schedule-form',
+  imports: [ReactiveFormsModule, RouterLink],
+  templateUrl: './work-schedule-form.component.html',
+  styleUrl: '../creation-form.scss',
 })
-export class WorkScheduleFormComponent extends CreationFormBase<WorkScheduleFormData> {
-  override endpoint: string = 'http://localhost:8080/api/group';
-  recurring = signal(false);
-  selectedDays = signal<string[]>([]);
-  startClockTime = signal('');
-  endClockTime = signal('');
-  scheduledDate = signal('');
+export class WorkScheduleFormComponent extends CreationFormBase<WorkGroup> {
+  private readonly groups = inject(WorkGroupService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
-  readonly isNextDay = computed(() => {
-    const start = this.startClockTime();
-    const end = this.endClockTime();
-    return start !== '' && end !== '' && end <= start;
+  protected readonly days = DAYS_OF_WEEK;
+  /** Group ID when editing; null when creating. */
+  protected readonly editId = signal<number | null>(null);
+
+  protected readonly form = new FormGroup({
+    groupName: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    groupDescription: new FormControl('', { nonNullable: true }),
+    recurring: new FormControl(true, { nonNullable: true }),
+    daysOfWeek: new FormControl<DayOfWeek[]>(['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY'], { nonNullable: true }),
+    startClockTime: new FormControl('09:00', { nonNullable: true, validators: [Validators.required] }),
+    endClockTime: new FormControl('11:00', { nonNullable: true, validators: [Validators.required] }),
+    scheduledDate: new FormControl(isoDate(new Date()), { nonNullable: true }),
   });
-
-
-  readonly taskIdInURL: string | null;
-  private route = inject(ActivatedRoute);
 
   constructor() {
     super();
-    this.taskIdInURL = this.route.snapshot.paramMap.get('id');
-
-    if (this.taskIdInURL != null) {
-      // pull the API and fill the form
-      super['http'].get<WorkScheduleFormData>(`http://localhost:8080/api/group/${this.taskIdInURL}`).subscribe(data => {
-        this.name.set(data.groupName);
-        this.description.set(data.groupDescription);
-        this.recurring.set(data.recurring);
-        this.selectedDays.set(data.daysOfWeek);
-        this.startClockTime.set(data.startClockTime);
-        this.endClockTime.set(data.endClockTime);
-        this.scheduledDate.set(data.scheduledDate);
-      })
+    const id = Number(this.route.snapshot.paramMap.get('id'));
+    if (id) {
+      this.editId.set(id);
+      this.groups.get(id).subscribe((group) => {
+        this.form.patchValue({
+          groupName: group.groupName,
+          groupDescription: group.groupDescription ?? '',
+          recurring: group.recurring,
+          daysOfWeek: group.daysOfWeek as DayOfWeek[],
+          startClockTime: group.startClockTime,
+          endClockTime: group.endClockTime,
+          scheduledDate: group.scheduledDate ?? isoDate(new Date()),
+        });
+      });
     }
   }
 
-  readonly days = DAYS;
-
-  toggleDay(day: string): void {
-    const current = this.selectedDays();
-    if (current.includes(day)) {
-      this.selectedDays.set(current.filter(d => d !== day));
-    } else {
-      this.selectedDays.set([...current, day]);
-    }
+  protected toggleDay(day: DayOfWeek): void {
+    const current = this.form.controls.daysOfWeek.value;
+    this.form.controls.daysOfWeek.setValue(
+      current.includes(day) ? current.filter((d) => d !== day) : [...current, day],
+    );
   }
 
-  isDaySelected(day: string): boolean {
-    return this.selectedDays().includes(day);
+  protected toPayload(): WorkGroup {
+    const v = this.form.getRawValue();
+    return {
+      id: this.editId() ?? undefined,
+      groupName: v.groupName.trim(),
+      groupDescription: v.groupDescription.trim(),
+      recurring: v.recurring,
+      daysOfWeek: v.recurring ? v.daysOfWeek : [],
+      startClockTime: v.startClockTime,
+      endClockTime: v.endClockTime,
+      scheduledDate: v.recurring ? null : v.scheduledDate,
+    };
   }
 
-  onSubmit(): void {
-    const mode = this.taskIdInURL != null ? FormMode.Update : FormMode.Create;
-    if (mode === FormMode.Update) {
-      this.endpoint = `http://localhost:8080/api/group/${this.taskIdInURL}`;
-    }
-    this.submit({
-      groupName: this.name(),
-      groupDescription: this.description(),
-      recurring: this.recurring(),
-      daysOfWeek: this.selectedDays(),
-      startClockTime: this.startClockTime(),
-      endClockTime: this.endClockTime(),
-      scheduledDate: this.scheduledDate(),
-    }, mode);
+  protected persist(payload: WorkGroup): Observable<WorkGroup> {
+    return this.groups.save(payload);
   }
 
-  getSubmitButtonDisplay() {
-    if (this.taskIdInURL != null) {
-      return "Update";
-    } else {
-      return "Create";
-    }
+  protected onSaved(): void {
+    this.router.navigate([this.editId() ? '/settings' : '/']);
+  }
+
+  protected deleteGroup(): void {
+    const id = this.editId();
+    if (!id || !confirm('Delete this work block?')) return;
+    this.groups.delete(id).subscribe(() => this.router.navigate(['/settings']));
   }
 }

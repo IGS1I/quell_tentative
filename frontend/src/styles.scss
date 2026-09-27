@@ -1,1 +1,70 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  --bg: #f6f5f2;
+  --surface: #ffffff;
+  --surface-2: #efede8;
+  --border: #dedad2;
+  --text: #22211f;
+  --muted: #6d6a64;
+  --accent: #4f6bed;
+  --accent-2: #8a6cf0;
+  --accent-soft: rgb(79 107 237 / 0.12);
+  --on-accent: #ffffff;
+  --danger: #c2413b;
+  --radius: 14px;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #15161a;
+    --surface: #1e2026;
+    --surface-2: #272a31;
+    --border: #33363f;
+    --text: #ecebe8;
+    --muted: #9b9ca3;
+    --accent: #8ea2ff;
+    --accent-2: #b59cff;
+    --accent-soft: rgb(142 162 255 / 0.15);
+    --on-accent: #15161a;
+    --danger: #ff8a80;
+  }
+}
+
+html, body { margin: 0; background: var(--bg); color: var(--text); font-size: 18px; }
+body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; line-height: 1.45; }
+
+.muted { color: var(--muted); }
+
+input, textarea, select {
+  font: inherit;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.55rem 0.7rem;
+  &:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+}
+
+button, .button {
+  font: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: var(--accent);
+  color: var(--on-accent);
+  text-decoration: none;
+  cursor: pointer;
+  &:disabled { opacity: 0.6; cursor: default; }
+}
+
+button.ghost, .button.ghost, button.secondary {
+  background: transparent;
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.icon-link { color: var(--muted); text-decoration: none; &:hover { color: var(--text); } }

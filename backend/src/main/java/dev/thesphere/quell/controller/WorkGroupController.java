@@ -1,7 +1,7 @@
 package dev.thesphere.quell.controller;
 
 import dev.thesphere.quell.dto.WorkGroupDTO;
-import dev.thesphere.quell.model.WorkGroup;
+import dev.thesphere.quell.dto.WorkGroupResponse;
 import dev.thesphere.quell.service.WorkGroupService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,26 +19,35 @@ public class WorkGroupController {
     }
 
     @PostMapping
-    public ResponseEntity<WorkGroup> create(@RequestBody WorkGroupDTO dto) {
-        return ResponseEntity.ok(service.create(dto));
+    public ResponseEntity<WorkGroupResponse> create(@RequestBody WorkGroupDTO dto) {
+        return ResponseEntity.ok(WorkGroupResponse.from(service.create(dto)));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<WorkGroup> update(@RequestBody WorkGroupDTO dto, @PathVariable Long id) {
+    public ResponseEntity<WorkGroupResponse> update(@RequestBody WorkGroupDTO dto, @PathVariable Long id) {
         return service.findById(id)
-                .map(wg -> ResponseEntity.ok(service.save(wg.replaceDTO(dto))))
+                .map(wg -> ResponseEntity.ok(WorkGroupResponse.from(service.save(wg.replaceDTO(dto)))))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<WorkGroup> get(@PathVariable Long id) {
+    public ResponseEntity<WorkGroupResponse> get(@PathVariable Long id) {
         return service.findById(id)
-                .map(ResponseEntity::ok)
+                .map(wg -> ResponseEntity.ok(WorkGroupResponse.from(wg)))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping
-    public ResponseEntity<List<WorkGroup>> getAll() {
-        return ResponseEntity.ok(service.findAll());
+    public ResponseEntity<List<WorkGroupResponse>> getAll() {
+        return ResponseEntity.ok(
+                service.findAll().stream().map(WorkGroupResponse::from).toList()
+        );
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        if (!service.existsById(id)) return ResponseEntity.notFound().build();
+        service.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

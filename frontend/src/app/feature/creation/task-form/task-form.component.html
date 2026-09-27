@@ -1,13 +1,73 @@
-<form (ngSubmit)="onSubmit()">
-  <label>
-    Name
-    <input type="text" [ngModel]="name()" (ngModelChange)="name.set($event)" name="name" required>
-  </label>
+<form class="creation-form" [formGroup]="form" (ngSubmit)="submit()">
+  <h1>{{ editUuid() ? 'Edit task' : 'New task' }}</h1>
 
   <label>
-    Description
-    <input type="text" [ngModel]="description()" (ngModelChange)="description.set($event)" name="description">
+    Title
+    <input formControlName="taskTitle" placeholder="Write chapter 3 outline" autofocus />
+  </label>
+  @if (form.controls.taskTitle.touched && form.controls.taskTitle.invalid) {
+    <span class="field-error">A title is required.</span>
+  }
+
+  <label>
+    Details
+    <textarea formControlName="taskDetails" rows="3" placeholder="Anything you'll want to remember"></textarea>
   </label>
 
-  <button type="submit">Create</button>
+  @if (editUuid()) {
+    <label>
+      Work block
+      <select formControlName="workGroupId">
+        @for (g of groups(); track g.id) {
+          <option [ngValue]="g.id">{{ g.groupName }} ({{ g.startClockTime }}–{{ g.endClockTime }})</option>
+        }
+      </select>
+    </label>
+  }
+
+  <fieldset>
+    <legend>Sub-points (optional)</legend>
+    @for (item of items.controls; track item; let i = $index) {
+      <div class="row">
+        <input [formControl]="item" placeholder="Deliverable {{ i + 1 }}" />
+        <button type="button" class="ghost" (click)="removeItem(i)" aria-label="Remove sub-point">&#x2715;</button>
+      </div>
+    }
+    <button type="button" class="ghost" (click)="addItem()">+ Add sub-point</button>
+  </fieldset>
+
+  <div class="grid-3">
+    <label>
+      Focus (min)
+      <input type="number" min="1" formControlName="pomodoroMinutes" />
+    </label>
+    <label>
+      Break (min)
+      <input type="number" min="1" formControlName="breakMinutes" />
+    </label>
+    <label>
+      Priority
+      <select formControlName="priority">
+        <option [ngValue]="3">High</option>
+        <option [ngValue]="2">Medium</option>
+        <option [ngValue]="1">Low</option>
+      </select>
+    </label>
+  </div>
+
+  @if (error()) {
+    <p class="field-error">{{ error() }}</p>
+  }
+
+  <div class="actions">
+    @if (editUuid()) {
+      <button type="button" class="ghost danger" (click)="deleteTask()">Delete</button>
+      <a class="button ghost" routerLink="/settings">Cancel</a>
+    } @else {
+      <a class="button ghost" [routerLink]="['/task-selector', createGroupId()]">Cancel</a>
+    }
+    <button type="submit" [disabled]="saving()">
+      {{ saving() ? 'Saving\u2026' : (editUuid() ? 'Save changes' : 'Save task') }}
+    </button>
+  </div>
 </form>

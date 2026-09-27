@@ -1,8 +1,10 @@
-<!-- this should be a rectangle box that has the titles of all associated tasks -->
-
-<div class="work-block-holder">
-  <h1>{{ workBlock?.groupName }}</h1>
-  @if (workBlock?.groupDescription) {
-    <p>{{ workBlock?.groupDescription }}</p>
+<a class="work-card" [class.now]="isNow()" [routerLink]="isNow() ? ['/task-selector', group().id] : ['/task-browser', group().id]">
+  <span class="time">{{ group().startClockTime }} – {{ group().endClockTime }}</span>
+  <strong>{{ group().groupName }}</strong>
+  @if (group().groupDescription) {
+    <p>{{ group().groupDescription }}</p>
   }
-</div>
+  @if (isNow()) {
+    <span class="badge">Now</span>
+  }
+</a>

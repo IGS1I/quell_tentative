@@ -1,17 +1,27 @@
-<html>
-    <head>
-        <title>Planner</title>
-    </head>
-    <body>
-        <h1>
-            <b>
-                {{ startOfWeek(curr_day).toDateString() }} - {{ endOfWeek() }}
-            </b>
-        </h1>
-        <p></p>
-        <div class="planner-content">
-        </div>
-        <p></p>
-    </body>
-</html>
+<main class="planner">
+  <header>
+    <a routerLink="/" class="ghost button">&larr; Home</a>
+    <div class="range">
+      <button type="button" class="ghost" (click)="weekOffset.set(weekOffset() - 1)" aria-label="Previous week">&lsaquo;</button>
+      <h1>{{ days()[0].date | date: 'MMM d' }} &ndash; {{ days()[6].date | date: 'MMM d' }}</h1>
+      <button type="button" class="ghost" (click)="weekOffset.set(weekOffset() + 1)" aria-label="Next week">&rsaquo;</button>
+    </div>
+    <a class="button" routerLink="/create/work">+ Block</a>
+  </header>
 
+  <section class="week">
+    @for (day of days(); track day.iso) {
+      <div class="day" [class.today]="day.iso === today">
+        <h2>{{ day.date | date: 'EEE d' }}</h2>
+        @for (block of day.blocks; track block.id) {
+          <a class="block" [routerLink]="blockIsNow(block, day.iso) ? ['/task-selector', block.id] : ['/task-browser', block.id]">
+            <span class="muted">{{ block.startClockTime }}&ndash;{{ block.endClockTime }}</span>
+            {{ block.groupName }}
+          </a>
+        } @empty {
+          <span class="muted free">Free</span>
+        }
+      </div>
+    }
+  </section>
+</main>

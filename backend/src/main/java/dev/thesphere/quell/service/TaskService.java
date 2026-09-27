@@ -5,8 +5,10 @@ import dev.thesphere.quell.model.Task;
 import dev.thesphere.quell.repository.TaskRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class TaskService {
@@ -18,12 +20,10 @@ public class TaskService {
     }
 
     public Task create(TaskDTO dto) {
-        Task task = new Task();
-        task.replaceDTO(dto);
-        return repository.save(task);
+        return repository.save(new Task().replaceDTO(dto));
     }
 
-    public Optional<Task> findById(Long id) {
+    public Optional<Task> findById(UUID id) {
         return repository.findById(id);
     }
 
@@ -33,5 +33,29 @@ public class TaskService {
 
     public List<Task> findAll() {
         return repository.findAll();
+    }
+
+    public List<Task> findByWorkGroupId(Long groupId) {
+        return repository.findByWorkGroupId(groupId);
+    }
+
+    public void delete(UUID id) {
+        repository.deleteById(id);
+    }
+
+    public Optional<Task> toggleActive(UUID id) {
+        return repository.findById(id).map(task -> {
+            task.setActive(!task.isActive());
+            return repository.save(task);
+        });
+    }
+
+    public Optional<Task> complete(UUID id) {
+        return repository.findById(id).map(task -> {
+            task.setActive(false);
+            task.setCompleted(true);
+            task.setCompletedAt(Instant.now());
+            return repository.save(task);
+        });
     }
 }

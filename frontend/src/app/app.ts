@@ -1,17 +1,15 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import {TaskComponent} from './feature/task/task.component';
-import {StartComponent} from './view/start/start.component';
-import { ActiveTaskComponent } from './view/active-task/active-task.component';
-import { PlannerComponent } from './view/planner/planner.component';
-import { TaskSelectorComponent } from './view/task-selector/task-selector.component';
+import { AlarmSchedulerService } from './feature/reward/alarm-scheduler.service';
 
 @Component({
-  imports: [RouterOutlet, TaskComponent, StartComponent, PlannerComponent, ActiveTaskComponent, TaskSelectorComponent],
   selector: 'app-root',
-  styleUrl: './app.scss',
-  templateUrl: './app.html',
+  imports: [RouterOutlet],
+  template: '<router-outlet />',
 })
 export class App {
-  protected readonly title = signal('frontend');
+  constructor() {
+    // Eagerly instantiate so block-start/end alarms are active for the app's lifetime.
+    inject(AlarmSchedulerService);
+  }
 }

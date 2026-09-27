@@ -1,31 +1,30 @@
-<!-- https://github.com/MyAngularApps/Analog-Clock-App -->
-<pomodoro-comp></pomodoro-comp>
-<div class="container">
-  <ul>
-    <li>
-      <div class="clock-view">
-        <!-- this can either be replaced with the clock in the figma or style this clock to fix -->
-        <analog-clock [options]="{ size: 200, showNumbers: true }"></analog-clock>
-      </div>
-    </li>
-    <li>
-      <div class="work-blocks">
-        @for (workBlock of workBlocks(); track workBlock.id) {
-          <work-comp [workBlock]="workBlock"/>
-        }
-      </div>
-    </li>
-    <li>
-      <div class="right-panel">
-        <ul>
-          <li>Planner</li>
-          <li>Settings</li>
-        </ul>
-      </div>
-    </li>
-  </ul>
+<main class="start">
+  <nav class="top">
+    <a routerLink="/planner" class="icon-link" aria-label="Planner">Planner</a>
+    <a routerLink="/settings" class="icon-link" aria-label="Settings">Settings</a>
+  </nav>
 
+  <app-clock />
 
-</div>
+  <section class="blocks" aria-label="Today's work blocks">
+    @for (block of blocks(); track block.id) {
+      <app-work [group]="block" [nowMinutes]="nowMinutes()" />
+    } @empty {
+      <div class="empty">
+        <p>No more work blocks today.</p>
+        <a class="button" routerLink="/create/work">Plan a work block</a>
+      </div>
+    }
+  </section>
 
-<p>Hello {{ name }} from child!</p>
+  @if (alarm.ringing()) {
+    <div class="alarm-bar">
+      <span>Alarm ringing</span>
+      <button type="button" class="stop-alarm" (click)="alarm.stop()">Stop alarm</button>
+    </div>
+  }
+
+  <nav class="bottom">
+    <a routerLink="/create/work" class="icon-link">+ Work block</a>
+  </nav>
+</main>
