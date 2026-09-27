@@ -1,0 +1,17 @@
+<div class="keyboard-wrapper" [class.open]="visible()">
+  <button
+    type="button"
+    class="keyboard-toggle"
+    (mousedown)="$event.preventDefault()"
+    (click)="toggleKeyboard()"
+    [attr.aria-label]="visible() ? 'Hide keyboard' : 'Show keyboard'"
+  >
+    @if (visible()) { ⌨ Hide } @else { ⌨ Show }
+  </button>
+
+  @if (visible()) {
+    <div class="keyboard-panel" (mousedown)="$event.preventDefault()">
+      <div #keyboardContainer class="simple-keyboard"></div>
+    </div>
+  }
+</div>

@@ -1,0 +1,52 @@
+.keyboard-wrapper {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+
+  &.open {
+    pointer-events: auto;
+  }
+}
+
+.keyboard-toggle {
+  pointer-events: auto;
+  position: fixed;
+  bottom: 0.75rem;
+  right: 0.75rem;
+  z-index: 1001;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.85rem;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--muted);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  opacity: 0.8;
+
+  &:hover {
+    opacity: 1;
+    color: var(--text);
+  }
+
+  .open & {
+    bottom: auto;
+    position: relative;
+    margin-bottom: 0.25rem;
+    align-self: flex-end;
+    margin-right: 0.75rem;
+  }
+}
+
+.keyboard-panel {
+  width: 100%;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 0.5rem;
+  box-sizing: border-box;
+}
