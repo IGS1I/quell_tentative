@@ -1,5 +1,7 @@
 # Quell — Productivity & Time-Block Manager
 
+
+
 > Whiteboard planning session reference: `reference/` folder (2026-09-27)
 
 ---
@@ -7,6 +9,8 @@
 ## Overview
 
 Quell is a task and work-block management app built around structured focus sessions (Pomodoro-style). The core idea is to give users a minimal friction way to schedule work blocks, assign tasks to them, and stay on track through visual cues and habit-loop reinforcement.
+
+For a more detailed explanation of codebase: <a target="_blank" href="https://deepwiki.com/IGS1I/Quell" title="DeepWiki for IGS1I/Quell repository"><img height="26px" src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki"></a>
 
 ---
 
@@ -18,6 +22,16 @@ Quell is a task and work-block management app built around structured focus sess
 | Backend   | Spring Boot             |
 | Database  | PostgreSQL + Hibernate  |
 | Container | Docker / Docker Compose |
+
+---
+
+## Hardware Stack
+
+| Device Name | Product Page | Documentation Link |
+| ----------- | ----------- | ------------------ |
+| Waveshare 9.3inch Capacitive Touch Display | [Eckstein shop](https://eckstein-shop.de/WaveShare-93inch-Capacitive-Touch-Display-1600x600-HDMI-IPS-Optical-Bonding-Toughened-Glass-Panel-EN) | [WaveShare Wiki](https://www.waveshare.com/wiki/9.3inch_1600x600_LCD) |
+| Raspberry Pi | [Raspberry Pi Products](https://www.raspberrypi.com/products/) | [Raspberry Pi Documentation](https://www.raspberrypi.com/documentation/) |
+| Amazon Basics Gas Spring Single Monitor Arm Desk Mount | [Amazon Product Page](https://www.amazon.com/dp/B0CQXMT3QC?lv=shuf&channelId=500&plpRedirect=mhFallback&th=1) | [User Manual](https://m.media-amazon.com/images/I/D1XLEJgU6ZL.pdf) |
 
 ---
 
